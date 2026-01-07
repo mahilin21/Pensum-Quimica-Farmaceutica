@@ -1,297 +1,182 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Pensum Química Farmacéutica – Universidad de Antioquia</title>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Malla Química Farmacéutica UdeA</title>
 <style>
-    body {
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: #fde6f2;
-        margin: 0;
-        padding: 20px;
-        color: #2b0020;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 5px;
-    }
-
-    h2 {
-        text-align: center;
-        margin-top: 0;
-        font-weight: normal;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        gap: 12px;
-    }
-
-    .semester {
-        background: #fff0f7;
-        border-radius: 12px;
-        padding: 8px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    .semester h3 {
-        text-align: center;
-        margin: 5px 0 10px;
-        color: #4E032A;
-    }
-
-    .course {
-        border-radius: 10px;
-        padding: 8px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 2px solid transparent;
-        position: relative;
-        font-size: 13px;
-    }
-
-    .course:hover {
-        transform: scale(1.02);
-    }
-
-    .course.approved {
-        opacity: 0.4;
-        text-decoration: line-through;
-    }
-
-    .course.locked {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-
-    .course .code {
-        font-size: 11px;
-        opacity: 0.8;
-    }
-
-    .course .credits {
-        font-size: 11px;
-        font-weight: bold;
-    }
-
-    .coreq {
-        border: 2px dashed #ffffff;
-    }
-
-    .coreq::after {
-        content: "💞";
-        position: absolute;
-        top: 4px;
-        right: 6px;
-        font-size: 14px;
-    }
-
-    /* ÁREAS */
-    .basica { background: #CF3790; color: white; }
-    .biomedica { background: #99065E; color: white; }
-    .farmaceutica { background: #4E032A; color: white; }
-    .socio { background: #F586D2; color: #2b0020; }
-    .flexible { background: #130E12; color: white; }
-
-    .tooltip {
-        visibility: hidden;
-        background: #4E032A;
-        color: white;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 10;
-        bottom: 105%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 180px;
-        font-size: 11px;
-    }
-
-    .course.locked:hover .tooltip {
-        visibility: visible;
-    }
-</style>
-</head>
+:root{--bg:#f3faf6;--t:#163828;--b:#cfeee0;--bm:#cdebe6;--f:#e3f0c6;--s:#e6ede8;--fl:#dbf5cf;--l:#e1e7e4;--pr:#1f6f4a;--co:#3b8f8c;--ok:#2fa36b}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:var(--bg);color:var(--t)}
+h1{text-align:center;margin:15px 0}
+#top{display:flex;justify-content:space-between;padding:10px 20px;font-weight:600}
+#wrap{position:relative}
+#m{display:grid;grid-template-columns:repeat(10,1fr);gap:12px;padding:20px;z-index:1;position:relative}
+.sem{background:#e9f5ef;border-radius:14px;padding:10px}
+.sem h3{text-align:center;font-size:14px}
+.mat{border-radius:12px;padding:8px;margin-bottom:8px;cursor:pointer;transition:.15s;position:relative}
+.mat.ap{outline:3px solid var(--ok)}
+.mat.lock{background:var(--l)!important;cursor:not-allowed;opacity:.6}
+.mat:hover:not(.lock){transform:scale(1.02)}
+.c{font-size:11px;opacity:.7}.n{font-size:13px;font-weight:600}.cr{font-size:11px}
+.basica{background:var(--b)}.biomedica{background:var(--bm)}.farmaceutica{background:var(--f)}
+.socio{background:var(--s)}.flexible{background:var(--fl)}
+.tip{display:none;position:absolute;top:100%;left:0;background:#fff;padding:8px;border-radius:10px;
+font-size:11px;box-shadow:0 8px 20px rgba(0,0,0,.15);width:240px;z-index:10}
+.mat:hover .tip{display:block}.pr{color:var(--pr)}.co{color:var(--co)}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+</style></head>
 <body>
 
-<h1>📚 Pensum Química Farmacéutica</h1>
-<h2>Versión 6 – Universidad de Antioquia</h2>
+<h1>Química Farmacéutica – Universidad de Antioquia</h1>
+<div id="top"><div id="cred"></div><div id="prog"></div>
+<button onclick="reset()">Reiniciar</button></div>
 
-<div class="grid" id="pensum"></div>
+<div id="wrap"><svg id="svg"></svg><div id="m"></div></div>
 
 <script>
-const courses = [
-    // ========== SEMESTRE 1 ==========
-    {id:"4007-600", name:"Matemáticas", area:"basica", credits:4, sem:1, pr:[], co:[]},
-    {id:"4008-600", name:"Química General", area:"basica", credits:4, sem:1, pr:[], co:["4008-601"]},
-    {id:"4008-601", name:"Lab. Química General", area:"basica", credits:1, sem:1, pr:[], co:["4008-600"]},
-    {id:"4012-400", name:"Seguridad y Salud en el Trabajo", area:"socio", credits:1, sem:1, pr:[], co:[]},
-    {id:"4010-500", name:"Técnicas de la Comunicación", area:"socio", credits:2, sem:1, pr:[], co:[]},
-    {id:"4012-402", name:"Desarrollo Humano", area:"socio", credits:1, sem:1, pr:[], co:[]},
-    {id:"4012-404", name:"Introducción a la Farmacia", area:"socio", credits:2, sem:1, pr:[], co:[]},
-    {id:"4012-459", name:"Inglés I", area:"socio", credits:2, sem:1, pr:[], co:[]},
+const M=[
+/* 1 */{i:"4007-600",n:"Matemáticas",s:1,c:4,a:"basica",pr:[],co:[]},
+{i:"4008-600",n:"Química General",s:1,c:4,a:"basica",pr:[],co:[]},
+{i:"4008-601",n:"Lab. Química General",s:1,c:1,a:"basica",pr:[],co:["4008-600"]},
+{i:"4012-400",n:"Seguridad y Salud en el Trabajo",s:1,c:1,a:"socio",pr:[],co:[]},
+{i:"4010-500",n:"Técnicas de la Comunicación",s:1,c:2,a:"socio",pr:[],co:[]},
+{i:"4012-402",n:"Desarrollo Humano",s:1,c:1,a:"socio",pr:[],co:[]},
+{i:"4012-404",n:"Introducción a la Farmacia",s:1,c:2,a:"socio",pr:[],co:[]},
+{i:"4012-459",n:"Inglés I",s:1,c:2,a:"socio",pr:[],co:[]},
 
-    // ========== SEMESTRE 2 ==========
-    {id:"4008-602", name:"Química Orgánica", area:"basica", credits:4, sem:2, pr:["4008-600","4008-601"], co:["4008-603"]},
-    {id:"4008-603", name:"Lab. Química Orgánica", area:"basica", credits:1, sem:2, pr:["4008-600","4008-601"], co:["4008-602"]},
-    {id:"4007-602", name:"Bioestadística", area:"basica", credits:2, sem:2, pr:["4007-600"], co:[]},
-    {id:"4008-604", name:"Química Analítica", area:"basica", credits:4, sem:2, pr:["4008-600","4008-601"], co:["4008-605"]},
-    {id:"4008-605", name:"Lab. Química Analítica", area:"basica", credits:1, sem:2, pr:["4008-600","4008-601"], co:["4008-604"]},
-    {id:"4012-401", name:"Seminario de Matemáticas", area:"basica", credits:1, sem:2, pr:["4007-600"], co:[]},
-    {id:"4012-406", name:"Salud Pública", area:"socio", credits:1, sem:2, pr:["4012-400"], co:[]},
-    {id:"4012-403", name:"Metodología Investigación Cualitativa", area:"socio", credits:1, sem:2, pr:[], co:["4007-602"]},
-    {id:"4012-460", name:"Inglés II", area:"socio", credits:2, sem:2, pr:["4012-459"], co:[]},
+/* 2 */{i:"4008-602",n:"Química Orgánica",s:2,c:4,a:"basica",pr:["4008-600","4008-601"],co:[]},
+{i:"4008-603",n:"Lab. Química Orgánica",s:2,c:1,a:"basica",pr:[],co:["4008-602"]},
+{i:"4007-602",n:"Bioestadística",s:2,c:2,a:"basica",pr:["4007-600"],co:[]},
+{i:"4008-604",n:"Química Analítica",s:2,c:4,a:"basica",pr:["4008-600","4008-601"],co:[]},
+{i:"4008-605",n:"Lab. Química Analítica",s:2,c:1,a:"basica",pr:[],co:["4008-604"]},
+{i:"4012-401",n:"Seminario de Matemáticas",s:2,c:1,a:"basica",pr:["4007-600"],co:[]},
+{i:"4012-406",n:"Salud Pública",s:2,c:1,a:"socio",pr:["4012-400"],co:[]},
+{i:"4012-403",n:"Metodología Inv. Cualitativa",s:2,c:1,a:"socio",pr:[],co:["4007-602"]},
+{i:"4012-460",n:"Inglés II",s:2,c:2,a:"socio",pr:["4012-459"],co:[]},
 
-    // ========== SEMESTRE 3 ==========
-    {id:"4009-338", name:"Formación Ciudadana", area:"socio", credits:1, sem:3, pr:[], co:[]},
-    {id:"4007-604", name:"Física", area:"basica", credits:3, sem:3, pr:["4012-401"], co:[]},
-    {id:"4010-600", name:"Biología Celular y Molecular", area:"biomedica", credits:3, sem:3, pr:[], co:["4012-412","4012-413"]},
-    {id:"4012-412", name:"Bioquímica", area:"biomedica", credits:3, sem:3, pr:["4008-604","4008-605"], co:["4012-413","4010-600"]},
-    {id:"4012-413", name:"Lab. Bioquímica", area:"biomedica", credits:1, sem:3, pr:[], co:["4012-412","4010-600"]},
-    {id:"4012-414", name:"Bioética", area:"socio", credits:1, sem:3, pr:["4012-404"], co:[]},
-    {id:"4012-407", name:"Prácticas Comunidad", area:"flexible", credits:1, sem:3, pr:["4012-406","4012-403"], co:[]},
-    {id:"4012-405", name:"Metodología Investigación Cuantitativa", area:"socio", credits:2, sem:3, pr:["4012-403"], co:[]},
-    {id:"4012-461", name:"Inglés III", area:"socio", credits:2, sem:3, pr:["4012-460"], co:[]},
+/* 3 */{i:"4009-338",n:"Formación Ciudadana",s:3,c:1,a:"socio",pr:[],co:[]},
+{i:"4007-604",n:"Física",s:3,c:3,a:"basica",pr:["4012-401"],co:[]},
+{i:"4010-600",n:"Biología Celular y Molecular",s:3,c:3,a:"biomedica",pr:[],co:["4012-412","4012-413"]},
+{i:"4012-412",n:"Bioquímica",s:3,c:3,a:"biomedica",pr:["4008-604","4008-605"],co:[]},
+{i:"4012-413",n:"Lab. Bioquímica",s:3,c:1,a:"biomedica",pr:[],co:["4012-412"]},
+{i:"4012-414",n:"Bioética",s:3,c:1,a:"socio",pr:["4012-404"],co:[]},
+{i:"4012-405",n:"Metodología Inv. Cuantitativa",s:3,c:2,a:"socio",pr:["4012-403"],co:[]},
+{i:"4012-461",n:"Inglés III",s:3,c:2,a:"socio",pr:["4012-460"],co:[]},
 
-    // ========== SEMESTRE 4 ==========
-    {id:"4012-420", name:"Biotecnología", area:"biomedica", credits:2, sem:4, pr:[], co:["4012-421"]},
-    {id:"4012-421", name:"Lab. Biotecnología", area:"biomedica", credits:2, sem:4, pr:[], co:["4012-420"]},
-    {id:"4012-416", name:"Fisioanatomía", area:"biomedica", credits:3, sem:4, pr:["4012-412"], co:["4012-417"]},
-    {id:"4012-417", name:"Lab. Fisioanatomía", area:"biomedica", credits:1, sem:4, pr:["4012-412"], co:["4012-416"]},
-    {id:"4008-606", name:"Fisicoquímica", area:"basica", credits:3, sem:4, pr:["4007-604","4008-602"], co:["4008-607"]},
-    {id:"4008-607", name:"Lab. Fisicoquímica", area:"basica", credits:1, sem:4, pr:["4007-604","4008-602"], co:["4008-606"]},
-    {id:"4010-602", name:"Microbiología", area:"biomedica", credits:2, sem:4, pr:["4010-600"], co:["4010-603"]},
-    {id:"4010-603", name:"Lab. Microbiología", area:"biomedica", credits:1, sem:4, pr:["4010-600"], co:["4010-602"]},
-    {id:"4012-462", name:"Inglés IV", area:"socio", credits:2, sem:4, pr:["4012-461"], co:[]},
+/* 4 */{i:"4012-420",n:"Biotecnología",s:4,c:2,a:"biomedica",pr:[],co:[]},
+{i:"4012-421",n:"Lab. Biotecnología",s:4,c:2,a:"biomedica",pr:[],co:["4012-420"]},
+{i:"4012-416",n:"Fisioanatomía",s:4,c:3,a:"biomedica",pr:["4012-412"],co:[]},
+{i:"4012-417",n:"Lab. Fisioanatomía",s:4,c:1,a:"biomedica",pr:[],co:["4012-416"]},
+{i:"4008-606",n:"Fisicoquímica",s:4,c:3,a:"basica",pr:["4007-604","4008-602"],co:[]},
+{i:"4008-607",n:"Lab. Fisicoquímica",s:4,c:1,a:"basica",pr:[],co:["4008-606"]},
+{i:"4010-602",n:"Microbiología",s:4,c:2,a:"biomedica",pr:["4010-600"],co:[]},
+{i:"4010-603",n:"Lab. Microbiología",s:4,c:1,a:"biomedica",pr:[],co:["4010-602"]},
+{i:"4012-462",n:"Inglés IV",s:4,c:2,a:"socio",pr:["4012-461"],co:[]},
 
-    // ========== SEMESTRE 5 ==========
-    {id:"4008-608", name:"Análisis Instrumental", area:"basica", credits:3, sem:5, pr:["4008-606","4008-607"], co:["4008-609"]},
-    {id:"4008-609", name:"Lab. Análisis Instrumental", area:"basica", credits:1, sem:5, pr:["4008-606","4008-607"], co:["4008-608"]},
-    {id:"4012-418", name:"Farmacognosia", area:"farmaceutica", credits:3, sem:5, pr:["4008-602","4008-603"], co:["4012-419"]},
-    {id:"4012-419", name:"Lab. Farmacognosia", area:"farmaceutica", credits:1, sem:5, pr:["4008-602","4008-603"], co:["4012-418"]},
-    {id:"4012-440", name:"Biofarmacia y Farmacocinética", area:"farmaceutica", credits:2, sem:5, pr:["4012-416","4008-606"], co:[]},
-    {id:"4012-422", name:"Operaciones Unitarias", area:"farmaceutica", credits:2, sem:5, pr:["4008-606"], co:[]},
-    {id:"4012-409", name:"Prácticas Servicios Farmacéuticos", area:"flexible", credits:1, sem:5, pr:["4012-407"], co:["4012-410"]},
-    {id:"4012-410", name:"Legislación Farmacéutica", area:"socio", credits:1, sem:5, pr:["4012-420"], co:["4012-409"]},
-    {id:"4012-429", name:"Diseño de Experimentos", area:"basica", credits:1, sem:5, pr:["4012-405"], co:[]},
-    {id:"4012-463", name:"Inglés V", area:"socio", credits:2, sem:5, pr:["4012-462"], co:[]},
+/* 5 */{i:"4008-608",n:"Análisis Instrumental",s:5,c:3,a:"basica",pr:["4008-606","4008-607"],co:[]},
+{i:"4008-609",n:"Lab. Análisis Instrumental",s:5,c:1,a:"basica",pr:[],co:["4008-608"]},
+{i:"4012-418",n:"Farmacognosia",s:5,c:3,a:"farmaceutica",pr:["4008-602","4008-603"],co:[]},
+{i:"4012-419",n:"Lab. Farmacognosia",s:5,c:1,a:"farmaceutica",pr:[],co:["4012-418"]},
+{i:"4012-440",n:"Biofarmacia y Farmacocinética",s:5,c:2,a:"farmaceutica",pr:["4012-416","4008-606"],co:[]},
+{i:"4012-422",n:"Operaciones Unitarias",s:5,c:2,a:"farmaceutica",pr:["4008-606"],co:[]},
+{i:"4012-409",n:"Prácticas Serv. Farmacéuticos",s:5,c:1,a:"flexible",pr:["4012-407"],co:["4012-410"]},
+{i:"4012-410",n:"Legislación Farmacéutica",s:5,c:1,a:"socio",pr:["4012-420"],co:[]},
+{i:"4012-429",n:"Diseño de Experimentos",s:5,c:1,a:"basica",pr:["4012-405"],co:[]},
+{i:"4012-463",n:"Inglés V",s:5,c:2,a:"socio",pr:["4012-462"],co:[]},
 
-    // ========== SEMESTRE 6 ==========
-    {id:"4012-442", name:"Fitoquímica", area:"farmaceutica", credits:2, sem:6, pr:["4012-418"], co:["4012-443"]},
-    {id:"4012-443", name:"Lab. Fitoquímica", area:"farmaceutica", credits:2, sem:6, pr:["4012-418"], co:["4012-442"]},
-    {id:"4012-426", name:"Tecnología Farmacéutica I", area:"farmaceutica", credits:3, sem:6, pr:["4012-422"], co:["4012-427"]},
-    {id:"4012-427", name:"Lab. Tecnología Farmacéutica I", area:"farmaceutica", credits:2, sem:6, pr:["4012-422"], co:["4012-426"]},
-    {id:"4012-428", name:"Electiva Socio-Humanística", area:"socio", credits:1, sem:6, pr:["4012-410"], co:[]},
-    {id:"4012-430", name:"Análisis y Control I", area:"farmaceutica", credits:3, sem:6, pr:["4008-608","4008-609"], co:["4012-426","4012-427","4012-431"]},
-    {id:"4012-431", name:"Lab. Análisis y Control I", area:"farmaceutica", credits:2, sem:6, pr:["4008-608","4008-609"], co:["4012-430"]},
-    {id:"4012-411", name:"Prácticas Sector Productivo", area:"flexible", credits:2, sem:6, pr:["4012-409"], co:[]},
+/* 6 */{i:"4012-442",n:"Fitoquímica",s:6,c:2,a:"farmaceutica",pr:["4012-418"],co:[]},
+{i:"4012-443",n:"Lab. Fitoquímica",s:6,c:2,a:"farmaceutica",pr:[],co:["4012-442"]},
+{i:"4012-426",n:"Tecnología Farmacéutica I",s:6,c:3,a:"farmaceutica",pr:["4012-422"],co:[]},
+{i:"4012-427",n:"Lab. Tec. Farmacéutica I",s:6,c:2,a:"farmaceutica",pr:[],co:["4012-426"]},
+{i:"4012-428",n:"Electiva Socio-Humanística",s:6,c:1,a:"socio",pr:["4012-410"],co:[]},
+{i:"4012-430",n:"Análisis y Control I",s:6,c:3,a:"farmaceutica",
+ pr:["4008-608","4008-609"],co:["4012-426","4012-427"]},
+{i:"4012-431",n:"Lab. Análisis y Control I",s:6,c:2,a:"farmaceutica",pr:[],co:["4012-430"]},
+{i:"4012-411",n:"Prácticas Sector Productivo",s:6,c:2,a:"flexible",pr:["4012-409"],co:[]},
 
-    // ========== SEMESTRE 7 ==========
-    {id:"4012-432", name:"Tecnología Farmacéutica II", area:"farmaceutica", credits:3, sem:7, pr:["4012-426","4012-427"], co:["4012-433"]},
-    {id:"4012-433", name:"Lab. Tecnología Farmacéutica II", area:"farmaceutica", credits:2, sem:7, pr:["4012-426","4012-427"], co:["4012-432"]},
-    {id:"4012-448", name:"Administración Farmacéutica", area:"socio", credits:2, sem:7, pr:["4012-410"], co:[]},
-    {id:"4012-436", name:"Análisis y Control II", area:"farmaceutica", credits:2, sem:7, pr:["4012-430","4012-431"], co:["4012-432","4012-433","4012-437"]},
-    {id:"4012-437", name:"Lab. Análisis y Control II", area:"farmaceutica", credits:1, sem:7, pr:["4012-430","4012-431"], co:["4012-436"]},
-    {id:"4012-439", name:"Elaboración Proyecto", area:"flexible", credits:2, sem:7, pr:["4012-411"], co:[]},
-    {id:"4012-444", name:"Cosméticos", area:"farmaceutica", credits:2, sem:7, pr:[], co:["4012-445","4012-433"]},
-    {id:"4012-445", name:"Lab. Cosméticos", area:"farmaceutica", credits:1, sem:7, pr:[], co:["4012-444","4012-433"]},
+/* 7 */{i:"4012-432",n:"Tecnología Farmacéutica II",s:7,c:3,a:"farmaceutica",
+ pr:["4012-426","4012-427"],co:[]},
+{i:"4012-433",n:"Lab. Tec. Farmacéutica II",s:7,c:2,a:"farmaceutica",pr:[],co:["4012-432"]},
+{i:"4012-448",n:"Administración Farmacéutica",s:7,c:2,a:"socio",pr:["4012-410"],co:[]},
+{i:"4012-436",n:"Análisis y Control II",s:7,c:2,a:"farmaceutica",
+ pr:["4012-430","4012-431"],co:["4012-432","4012-433"]},
+{i:"4012-437",n:"Lab. Análisis y Control II",s:7,c:1,a:"farmaceutica",pr:[],co:["4012-436"]},
+{i:"4012-439",n:"Prácticas Elaboración Proyecto",s:7,c:2,a:"flexible",pr:["4012-411"],co:[]},
+{i:"4012-444",n:"Cosméticos",s:7,c:2,a:"farmaceutica",pr:[],co:["4012-432"]},
+{i:"4012-445",n:"Lab. Cosméticos",s:7,c:1,a:"farmaceutica",pr:[],co:["4012-444","4012-433"]},
 
-    // ========== SEMESTRE 8 ==========
-    {id:"4012-434", name:"Toxicología", area:"biomedica", credits:2, sem:8, pr:["4012-436","4012-437"], co:["4012-435"]},
-    {id:"4012-435", name:"Lab. Toxicología", area:"biomedica", credits:1, sem:8, pr:["4012-436","4012-437"], co:["4012-434"]},
-    {id:"4012-415", name:"Seminario Farmacología", area:"biomedica", credits:1, sem:8, pr:[], co:["4012-408"]},
-    {id:"4012-424", name:"Nutrición y Bromatología", area:"farmaceutica", credits:2, sem:8, pr:["4012-432","4012-440"], co:["4012-425"]},
-    {id:"4012-425", name:"Lab. Nutrición y Bromatología", area:"farmaceutica", credits:1, sem:8, pr:["4012-432","4012-440"], co:["4012-424"]},
-    {id:"4012-408", name:"Farmacología", area:"biomedica", credits:4, sem:8, pr:["4012-440","4012-442"], co:["4012-415"]},
-    {id:"4012-446", name:"Farmacia Hospitalaria", area:"farmaceutica", credits:2, sem:8, pr:["4012-409","4012-436"], co:[]},
-    {id:"4012-441", name:"Desarrollo Proyecto I", area:"flexible", credits:2, sem:8, pr:["4012-439"], co:[]},
+/* 8 */{i:"4012-434",n:"Toxicología",s:8,c:2,a:"biomedica",
+ pr:["4012-436","4012-437"],co:[]},
+{i:"4012-435",n:"Lab. Toxicología",s:8,c:1,a:"biomedica",pr:[],co:["4012-434"]},
+{i:"4012-415",n:"Seminario de Farmacología",s:8,c:1,a:"biomedica",pr:[],co:["4012-408"]},
+{i:"4012-424",n:"Nutrición y Bromatología",s:8,c:2,a:"farmaceutica",
+ pr:["4012-432","4012-440"],co:[]},
+{i:"4012-425",n:"Lab. Nutrición y Bromatología",s:8,c:1,a:"farmaceutica",pr:[],co:["4012-424"]},
+{i:"4012-408",n:"Farmacología",s:8,c:4,a:"biomedica",
+ pr:["4012-440","4012-442"],co:[]},
+{i:"4012-446",n:"Farmacia Hospitalaria",s:8,c:2,a:"farmaceutica",
+ pr:["4012-409","4012-436"],co:[]},
+{i:"4012-441",n:"Prácticas Proyecto I",s:8,c:2,a:"flexible",pr:["4012-439"],co:[]},
 
-    // ========== SEMESTRE 9 ==========
-    {id:"4012-438", name:"Electiva Administrativa", area:"socio", credits:1, sem:9, pr:["4012-432","4012-448"], co:[]},
-    {id:"4012-450", name:"Farmacia Clínica", area:"farmaceutica", credits:4, sem:9, pr:["4012-408","4012-446"], co:["4012-451"]},
-    {id:"4012-451", name:"Prácticas Farmacia Clínica", area:"farmaceutica", credits:3, sem:9, pr:["4012-408","4012-446"], co:["4012-450"]},
-    {id:"4012-452", name:"Química Farmacéutica", area:"farmaceutica", credits:2, sem:9, pr:["4012-436","4012-408"], co:["4012-453"]},
-    {id:"4012-453", name:"Lab. Química Farmacéutica", area:"farmaceutica", credits:1, sem:9, pr:["4012-436","4012-408"], co:["4012-452"]},
-    {id:"4012-454", name:"Farmacia Magistral", area:"farmaceutica", credits:2, sem:9, pr:["4012-432","4012-433"], co:["4012-455"]},
-    {id:"4012-455", name:"Lab. Farmacia Magistral", area:"farmaceutica", credits:1, sem:9, pr:["4012-432","4012-433"], co:["4012-454"]},
-    {id:"4012-457", name:"Desarrollo Proyecto II", area:"flexible", credits:2, sem:9, pr:["4012-441"], co:[]},
-    {id:"4012-456", name:"Aseguramiento de la Calidad", area:"farmaceutica", credits:1, sem:9, pr:["4012-432"], co:[]},
+/* 9 */{i:"4012-438",n:"Electiva Administrativa",s:9,c:1,a:"socio",
+ pr:["4012-432","4012-448"],co:[]},
+{i:"4012-450",n:"Farmacia Clínica",s:9,c:4,a:"farmaceutica",
+ pr:["4012-408","4012-446"],co:[]},
+{i:"4012-451",n:"Prácticas Farmacia Clínica",s:9,c:3,a:"farmaceutica",
+ pr:[],co:["4012-450"]},
+{i:"4012-452",n:"Química Farmacéutica",s:9,c:2,a:"farmaceutica",
+ pr:["4012-436","4012-408"],co:[]},
+{i:"4012-453",n:"Lab. Química Farmacéutica",s:9,c:1,a:"farmaceutica",pr:[],co:["4012-452"]},
+{i:"4012-454",n:"Farmacia Magistral",s:9,c:2,a:"farmaceutica",
+ pr:["4012-432","4012-433"],co:[]},
+{i:"4012-455",n:"Lab. Farmacia Magistral",s:9,c:1,a:"farmaceutica",pr:[],co:["4012-454"]},
+{i:"4012-457",n:"Prácticas Proyecto II",s:9,c:2,a:"flexible",pr:["4012-441"],co:[]},
+{i:"4012-456",n:"Aseguramiento de la Calidad",s:9,c:1,a:"farmaceutica",pr:["4012-432"],co:[]},
 
-    // ========== SEMESTRE 10 ==========
-    {id:"4012-459F", name:"Práctica Académica Final", area:"farmaceutica", credits:16, sem:10, pr:[], co:[]}
+/* 10 */{i:"4012-459-FINAL",n:"Práctica Académica Final",s:10,c:16,a:"farmaceutica",pr:["CRED149"],co:[]}
 ];
 
-const container = document.getElementById("pensum");
-const approved = JSON.parse(localStorage.getItem("approvedCourses") || "[]");
+let A=JSON.parse(localStorage.getItem("A")||"[]");
+const tot=()=>M.filter(x=>A.includes(x.i)).reduce((s,x)=>s+x.c,0);
+const ok=m=>m.pr.includes("CRED149")?tot()>=149:m.pr.every(p=>A.includes(p));
 
-function isApproved(id){
-    return approved.includes(id);
+function draw(){
+const m=document.getElementById("m"),svg=document.getElementById("svg");
+m.innerHTML="";svg.innerHTML="";
+for(let s=1;s<=10;s++){
+let c=document.createElement("div");c.className="sem";c.innerHTML=`<h3>Sem ${s}</h3>`;
+M.filter(x=>x.s===s).forEach(x=>{
+let d=document.createElement("div");d.className=`mat ${x.a}`;d.id=x.i;
+let lock=!ok(x)&&!A.includes(x.i);
+if(lock)d.classList.add("lock");if(A.includes(x.i))d.classList.add("ap");
+d.onclick=()=>{if(lock)return;A.includes(x.i)?A=A.filter(y=>y!==x.i):A.push(x.i);
+localStorage.setItem("A",JSON.stringify(A));draw();};
+d.innerHTML=`<div class="c">${x.i}</div><div class="n">${x.n}</div>
+<div class="cr">${x.c} créditos</div>
+<div class="tip">${x.pr.length?`<div class="pr">PR: ${x.pr.join(", ")}</div>`:""}
+${x.co.length?`<div class="co">CO: ${x.co.join(", ")}</div>`:""}</div>`;
+c.appendChild(d);});
+m.appendChild(c);}
+document.getElementById("cred").innerText=`Créditos aprobados: ${tot()}`;
+document.getElementById("prog").innerText=`Progreso: ${Math.round(tot()/160*100)}%`;
+lines();
 }
 
-function canTake(course){
-    return course.pr.every(pr => isApproved(pr));
+function lines(){
+M.forEach(x=>{
+let f=document.getElementById(x.i);if(!f)return;
+let r=f.getBoundingClientRect();
+[...x.pr,...x.co].forEach(d=>{
+let t=document.getElementById(d);if(!t)return;
+let tr=t.getBoundingClientRect();
+let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+l.setAttribute("x1",r.left+r.width);l.setAttribute("y1",r.top+r.height/2);
+l.setAttribute("x2",tr.left);l.setAttribute("y2",tr.top+tr.height/2);
+l.setAttribute("stroke",x.pr.includes(d)?"#1f6f4a":"#3b8f8c");
+l.setAttribute("stroke-width","2");
+if(x.co.includes(d))l.setAttribute("stroke-dasharray","5,5");
+document.getElementById("svg").appendChild(l);
+});
+});
 }
 
-function toggleCourse(id){
-    const index = approved.indexOf(id);
-    if(index >= 0){
-        approved.splice(index,1);
-    } else {
-        approved.push(id);
-    }
-    localStorage.setItem("approvedCourses", JSON.stringify(approved));
-    render();
-}
-
-function render(){
-    container.innerHTML = "";
-    for(let s=1; s<=10; s++){
-        const semDiv = document.createElement("div");
-        semDiv.className = "semester";
-        semDiv.innerHTML = `<h3>Semestre ${s}</h3>`;
-
-        courses.filter(c => c.sem === s).forEach(course => {
-            const div = document.createElement("div");
-            div.className = `course ${course.area}`;
-
-            if(course.co.length > 0) div.classList.add("coreq");
-
-            if(isApproved(course.id)) div.classList.add("approved");
-
-            const allowed = canTake(course);
-
-            if(!allowed && !isApproved(course.id)){
-                div.classList.add("locked");
-                const tip = document.createElement("div");
-                tip.className = "tooltip";
-                tip.innerText = "Falta: " + course.pr.join(", ");
-                div.appendChild(tip);
-            }
-
-            div.innerHTML += `
-                <div class="code">${course.id}</div>
-                <strong>${course.name}</strong><br>
-                <span class="credits">Créditos: ${course.credits}</span>
-            `;
-
-            if(allowed || isApproved(course.id)){
-                div.onclick = () => toggleCourse(course.id);
-            }
-
-            semDiv.appendChild(div);
-        });
-
-        container.appendChild(semDiv);
-    }
-}
-
-render();
+function reset(){if(confirm("¿Reiniciar malla?")){A=[];localStorage.clear();draw();}}
+draw();
 </script>
-
-</body>
-</html>
+</body></html>
