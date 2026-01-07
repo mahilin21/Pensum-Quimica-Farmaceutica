@@ -1,36 +1,109 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-<title>Malla Química Farmacéutica UdeA</title>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Malla Química Farmacéutica</title>
 <style>
-:root{--bg:#f3faf6;--t:#163828;--b:#cfeee0;--bm:#cdebe6;--f:#e3f0c6;--s:#e6ede8;--fl:#dbf5cf;--l:#e1e7e4;--pr:#1f6f4a;--co:#3b8f8c;--ok:#2fa36b}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:var(--bg);color:var(--t)}
-h1{text-align:center;margin:15px 0}
-#top{display:flex;justify-content:space-between;padding:10px 20px;font-weight:600}
-#wrap{position:relative}
-#m{display:grid;grid-template-columns:repeat(10,1fr);gap:12px;padding:20px;z-index:1;position:relative}
-.sem{background:#e9f5ef;border-radius:14px;padding:10px}
-.sem h3{text-align:center;font-size:14px}
-.mat{border-radius:12px;padding:8px;margin-bottom:8px;cursor:pointer;transition:.15s;position:relative}
-.mat.ap{outline:3px solid var(--ok)}
-.mat.lock{background:var(--l)!important;cursor:not-allowed;opacity:.6}
+:root{
+--basica:#f7c6d9;
+--biomed:#e6c9f0;
+--farm:#ffd6c9;
+--socio:#f1e3ea;
+--flex:#e4f1e8;
+--bloq:#d8d8d8;
+--ok:#c94f7c;
+--txt:#4a2b3a;
+}
+body{
+margin:0;
+font-family:system-ui;
+background:#fff7fb;
+color:var(--txt)
+}
+h1{text-align:center;margin:15px}
+#top{
+display:flex;
+justify-content:space-between;
+padding:10px 20px;
+font-weight:600
+}
+#malla{
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:12px;
+padding:20px
+}
+.sem{
+background:#fff;
+border-radius:14px;
+padding:10px
+}
+.sem h3{
+text-align:center;
+font-size:14px;
+margin-bottom:8px
+}
+.mat{
+border-radius:12px;
+padding:8px;
+margin-bottom:8px;
+cursor:pointer;
+transition:.15s;
+border:2px solid transparent;
+position:relative
+}
 .mat:hover:not(.lock){transform:scale(1.02)}
-.c{font-size:11px;opacity:.7}.n{font-size:13px;font-weight:600}.cr{font-size:11px}
-.basica{background:var(--b)}.biomedica{background:var(--bm)}.farmaceutica{background:var(--f)}
-.socio{background:var(--s)}.flexible{background:var(--fl)}
-.tip{display:none;position:absolute;top:100%;left:0;background:#fff;padding:8px;border-radius:10px;
-font-size:11px;box-shadow:0 8px 20px rgba(0,0,0,.15);width:240px;z-index:10}
-.mat:hover .tip{display:block}.pr{color:var(--pr)}.co{color:var(--co)}
-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
-</style></head>
+.mat.aprobada{outline:3px solid var(--ok)}
+.mat.lock{
+background:var(--bloq)!important;
+cursor:not-allowed;
+opacity:.6
+}
+.mat.co{border:2px dashed #c27ba0}
+.basica{background:var(--basica)}
+.biomedica{background:var(--biomed)}
+.farmaceutica{background:var(--farm)}
+.socio{background:var(--socio)}
+.flexible{background:var(--flex)}
+.c{font-size:11px;opacity:.7}
+.n{font-size:13px;font-weight:600}
+.cr{font-size:11px}
+.tip{
+display:none;
+position:absolute;
+top:100%;
+left:0;
+background:white;
+padding:8px;
+border-radius:10px;
+font-size:11px;
+box-shadow:0 6px 18px rgba(0,0,0,.15);
+width:230px;
+z-index:10
+}
+.mat:hover .tip{display:block}
+.pr{color:#a13a5f}
+.co{color:#7a4b8c}
+</style>
+</head>
+
 <body>
 
-<h1>Química Farmacéutica – Universidad de Antioquia</h1>
-<div id="top"><div id="cred"></div><div id="prog"></div>
-<button onclick="reset()">Reiniciar</button></div>
+<h1>Malla Curricular – Química Farmacéutica</h1>
 
-<div id="wrap"><svg id="svg"></svg><div id="m"></div></div>
+<div id="top">
+<div id="cred"></div>
+<button onclick="reset()">Reiniciar</button>
+</div>
+
+<div id="malla"></div>
 
 <script>
 const M=[
+
+/* --- EJEMPLO DE ESTRUCTURA (EL RESTO SIGUE IGUAL QUE ANTES) --- */
+/* Por límite visual aquí te muestro el patrón correcto */
+
 /* 1 */{i:"4007-600",n:"Matemáticas",s:1,c:4,a:"basica",pr:[],co:[]},
 {i:"4008-600",n:"Química General",s:1,c:4,a:"basica",pr:[],co:[]},
 {i:"4008-601",n:"Lab. Química General",s:1,c:1,a:"basica",pr:[],co:["4008-600"]},
@@ -133,50 +206,50 @@ const M=[
 ];
 
 let A=JSON.parse(localStorage.getItem("A")||"[]");
-const tot=()=>M.filter(x=>A.includes(x.i)).reduce((s,x)=>s+x.c,0);
-const ok=m=>m.pr.includes("CRED149")?tot()>=149:m.pr.every(p=>A.includes(p));
+
+const ok=m=>m.pr.every(p=>A.includes(p));
 
 function draw(){
-const m=document.getElementById("m"),svg=document.getElementById("svg");
-m.innerHTML="";svg.innerHTML="";
+const cont=document.getElementById("malla");
+cont.innerHTML="";
 for(let s=1;s<=10;s++){
-let c=document.createElement("div");c.className="sem";c.innerHTML=`<h3>Sem ${s}</h3>`;
+let sem=document.createElement("div");
+sem.className="sem";
+sem.innerHTML=`<h3>Semestre ${s}</h3>`;
 M.filter(x=>x.s===s).forEach(x=>{
-let d=document.createElement("div");d.className=`mat ${x.a}`;d.id=x.i;
+let d=document.createElement("div");
 let lock=!ok(x)&&!A.includes(x.i);
-if(lock)d.classList.add("lock");if(A.includes(x.i))d.classList.add("ap");
-d.onclick=()=>{if(lock)return;A.includes(x.i)?A=A.filter(y=>y!==x.i):A.push(x.i);
-localStorage.setItem("A",JSON.stringify(A));draw();};
-d.innerHTML=`<div class="c">${x.i}</div><div class="n">${x.n}</div>
+d.className=`mat ${x.a} ${x.co.length?"co":""} ${lock?"lock":""} ${A.includes(x.i)?"aprobada":""}`;
+d.onclick=()=>{
+if(lock)return;
+A.includes(x.i)?A=A.filter(y=>y!==x.i):A.push(x.i);
+localStorage.setItem("A",JSON.stringify(A));
+draw();
+};
+d.innerHTML=`
+<div class="c">${x.i} ${x.co.length?"🔗":""}</div>
+<div class="n">${x.n}</div>
 <div class="cr">${x.c} créditos</div>
-<div class="tip">${x.pr.length?`<div class="pr">PR: ${x.pr.join(", ")}</div>`:""}
-${x.co.length?`<div class="co">CO: ${x.co.join(", ")}</div>`:""}</div>`;
-c.appendChild(d);});
-m.appendChild(c);}
-document.getElementById("cred").innerText=`Créditos aprobados: ${tot()}`;
-document.getElementById("prog").innerText=`Progreso: ${Math.round(tot()/160*100)}%`;
-lines();
+<div class="tip">
+${x.pr.length?`<div class="pr">Prerrequisitos: ${x.pr.join(", ")}</div>`:""}
+${x.co.length?`<div class="co">Correquisitos: ${x.co.join(", ")}</div>`:""}
+</div>`;
+sem.appendChild(d);
+});
+cont.appendChild(sem);
+}
+document.getElementById("cred").innerText=
+"Créditos aprobados: "+
+M.filter(x=>A.includes(x.i)).reduce((s,x)=>s+x.c,0);
 }
 
-function lines(){
-M.forEach(x=>{
-let f=document.getElementById(x.i);if(!f)return;
-let r=f.getBoundingClientRect();
-[...x.pr,...x.co].forEach(d=>{
-let t=document.getElementById(d);if(!t)return;
-let tr=t.getBoundingClientRect();
-let l=document.createElementNS("http://www.w3.org/2000/svg","line");
-l.setAttribute("x1",r.left+r.width);l.setAttribute("y1",r.top+r.height/2);
-l.setAttribute("x2",tr.left);l.setAttribute("y2",tr.top+tr.height/2);
-l.setAttribute("stroke",x.pr.includes(d)?"#1f6f4a":"#3b8f8c");
-l.setAttribute("stroke-width","2");
-if(x.co.includes(d))l.setAttribute("stroke-dasharray","5,5");
-document.getElementById("svg").appendChild(l);
-});
-});
-}
-
-function reset(){if(confirm("¿Reiniciar malla?")){A=[];localStorage.clear();draw();}}
+function reset(){
+if(confirm("¿Reiniciar malla?")){
+A=[];
+localStorage.clear();
+draw();
+}}
 draw();
 </script>
-</body></html>
+</body>
+</html>
