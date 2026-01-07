@@ -5,19 +5,19 @@
 <title>Pensum Química Farmacéutica – Versión 06 | Universidad de Antioquia</title>
 <style>
 :root{
-  --pink-1:#fde7ef;
-  --pink-2:#f9c5d1;
-  --pink-3:#f48fb1;
-  --pink-4:#ec407a;
-  --pink-5:#ad1457;
-  --blocked:#f2f2f2;
-  --text:#4a2b36;
+  --green-1:#DFEBC8;
+  --green-2:#C1CE9C;
+  --green-3:#ADC26B;
+  --green-4:#849532;
+  --green-5:#5A641E;
+  --blocked:#ececec;
+  --text:#2f3a1f;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:'Segoe UI', system-ui, sans-serif;
-  background:linear-gradient(120deg,var(--pink-1),#fff);
+  background:linear-gradient(120deg,var(--green-1),#fff);
   color:var(--text);
   font-size:14px;
 }
@@ -25,7 +25,7 @@ header{
   padding:20px;
   text-align:center;
 }
-header h1{margin:0;color:var(--pink-5)}
+header h1{margin:0;color:var(--green-5)}
 #progress{
   max-width:1200px;
   margin:0 auto 10px;
@@ -55,7 +55,7 @@ header h1{margin:0;color:var(--pink-5)}
   font-size:15px;
 }
 .course{
-  background:var(--pink-2);
+  background:var(--green-2);
   border-radius:12px;
   padding:8px;
   margin-bottom:8px;
@@ -66,7 +66,7 @@ header h1{margin:0;color:var(--pink-5)}
 }
 .course:hover{transform:scale(1.02)}
 .course.approved{
-  background:var(--pink-4);
+  background:var(--green-4);
   color:white;
   text-decoration:line-through;
 }
@@ -76,7 +76,7 @@ header h1{margin:0;color:var(--pink-5)}
   cursor:not-allowed;
 }
 .course.coreq{
-  border:2px dashed var(--pink-4);
+  border:2px dashed var(--green-4);
 }
 .course.coreq::after{
   content:" 🌸";
@@ -124,7 +124,7 @@ header h1{margin:0;color:var(--pink-5)}
 #progressFill{
   height:100%;
   width:0%;
-  background:linear-gradient(90deg,var(--pink-3),var(--pink-5));
+  background:linear-gradient(90deg,var(--green-3),var(--green-5));
   transition:width .4s ease;
 }
 </style>
@@ -261,10 +261,10 @@ function render(){
     col.innerHTML=`<h2>Semestre ${level.level}</h2>`;
     level.courses.forEach(c=>{
       const div=document.createElement('div');
-      const blocked=!prereqOk(c);
+      const blocked = !prereqOk(c) || (c.coreq && !prereqOk(c));
       div.className='course';
       if(blocked) div.classList.add('blocked');
-      if(c.coreq || data.some(l=>l.courses.some(x=>x.coreq && x.coreq.includes(c.code)))) div.classList.add('coreq');
+      if(c.coreq){l=>l.courses.some(x=>x.coreq && x.coreq.includes(c.code)))) div.classList.add('coreq');
       if(isApproved(c.code)){
         div.classList.add('approved');
         totalCredits+=c.cr;
@@ -294,4 +294,5 @@ render();
 </script>
 </body>
 </html>
+
 
