@@ -68,6 +68,7 @@ header h1{margin:0;color:var(--pink-5)}
 .course.approved{
   background:var(--pink-4);
   color:white;
+  text-decoration:line-through;
 }
 .course.blocked{
   background:var(--blocked);
@@ -76,6 +77,9 @@ header h1{margin:0;color:var(--pink-5)}
 }
 .course.coreq{
   border:2px dashed var(--pink-4);
+}
+.course.coreq::after{
+  content:" 🌸";
 }
 .course .code{
   font-size:12px;
@@ -254,13 +258,13 @@ function render(){
   data.forEach(level=>{
     const col=document.createElement('div');
     col.className='year';
-    col.innerHTML=`<h2>Nivel ${level.level}</h2>`;
+    col.innerHTML=`<h2>Semestre ${level.level}</h2>`;
     level.courses.forEach(c=>{
       const div=document.createElement('div');
       const blocked=!prereqOk(c);
       div.className='course';
       if(blocked) div.classList.add('blocked');
-      if(c.coreq) div.classList.add('coreq');
+      if(c.coreq || data.some(l=>l.courses.some(x=>x.coreq && x.coreq.includes(c.code)))) div.classList.add('coreq');
       if(isApproved(c.code)){
         div.classList.add('approved');
         totalCredits+=c.cr;
