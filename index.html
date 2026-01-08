@@ -258,36 +258,61 @@ function prereqOk(course){
 }
 function render(){
   const grid = document.getElementById('grid');
-  if(!grid){ console.error('No se encontró #grid'); return; }
-  grid.innerHTML='';
-  let totalCredits=0;
-  console.log('Renderizando malla', data);
-  data.forEach(level=>{
-    const col=document.createElement('div');
-    col.className='year';
-    col.innerHTML=`<h2>Semestre ${level.level}</h2>`;
-    level.courses.forEach(c=>{
-      const div=document.createElement('div');
+  if(!grid){ console.error('No existe #grid'); return; }
+
+  grid.innerHTML = '';
+  let totalCredits = 0;
+
+  data.forEach(level => {
+    const col = document.createElement('div');
+    col.className = 'year';
+    col.innerHTML = `<h2>Semestre ${level.level}</h2>`;
+
+    level.courses.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'course';
+
       const blocked = !prereqOk(c);
-      div.className='course';
       if(blocked) div.classList.add('blocked');
-      if(c.coreq) div.classList.add('coreq');l=>l.courses.some(x=>x.coreq && x.coreq.includes(c.code)))) div.classList.add('coreq');
+      if(c.coreq) div.classList.add('coreq');
+
       if(isApproved(c.code)){
         div.classList.add('approved');
-        totalCredits+=c.cr;
+        totalCredits += c.cr;
       }
-      div.innerHTML=`<div class="code">${c.code}</div><strong>${c.name}</strong><div class="credits">${c.cr} créditos</div>`;>${c.code}</div><strong>${c.name}</strong><div class="credits">${c.cr} créditos</div>`;
+
+      div.innerHTML = `
+        <div class="code">${c.code}</div>
+        <strong>${c.name}</strong>
+        <div class="credits">${c.cr} créditos</div>
+      `;
+
       if(blocked){
-        const tip=document.createElement('div');
-        tip.className='tooltip';
-        tip.textContent='Faltan prerrequisitos';
+        const tip = document.createElement('div');
+        tip.className = 'tooltip';
+        tip.textContent = 'Faltan prerrequisitos';
         div.appendChild(tip);
       }
-      div.onclick=()=>{
+
+      div.onclick = () => {
         if(blocked) return;
-        state[c.code]=!isApproved(c.code);
-        localStorage.setItem('qf-progress',JSON.stringify(state));
+        state[c.code] = !isApproved(c.code);
+        localStorage.setItem('qf-progress', JSON.stringify(state));
         render();
+      };
+
+      col.appendChild(div);
+    });
+
+    grid.appendChild(col);
+  });
+
+  document.getElementById('credits').textContent = totalCredits;
+  const totalPensum = 160;
+  document.getElementById('progressFill').style.width = Math.min(100,(totalCredits/totalPensum)*100) + '%';
+}
+
+render();
       };
       col.appendChild(div);
     });
