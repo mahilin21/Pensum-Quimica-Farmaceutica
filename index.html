@@ -2,38 +2,36 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Pensum Química Farmacéutica – Versión 06 | Universidad de Antioquia</title>
+<title>Malla Curricular QF – Universidad de Antioquia</title>
 <style>
 :root{
-  --green-1:#DFEBC8;
-  --green-2:#C1CE9C;
-  --green-3:#ADC26B;
-  --green-4:#849532;
-  --green-5:#5A641E;
-  --blocked:#ececec;
-  --text:#2f3a1f;
+  --pink-1:#fde7ef;
+  --pink-2:#f9c5d1;
+  --pink-3:#f48fb1;
+  --pink-4:#ec407a;
+  --pink-5:#ad1457;
+  --blocked:#f2f2f2;
+  --text:#4a2b36;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:'Segoe UI', system-ui, sans-serif;
-  background:linear-gradient(120deg,var(--green-1),#fff);
+  background:linear-gradient(120deg,var(--pink-1),#fff);
   color:var(--text);
-  font-size:14px;
 }
 header{
   padding:20px;
   text-align:center;
 }
-header h1{margin:0;color:var(--green-5)}
+header h1{margin:0;color:var(--pink-5)}
 #progress{
   max-width:1200px;
-  margin:0 auto 10px;
+  margin:0 auto 20px;
   background:#fff;
-  padding:10px 14px;
+  padding:12px 16px;
   border-radius:12px;
   box-shadow:0 4px 10px rgba(0,0,0,.08);
-  font-size:13px;
 }
 #grid{
   display:grid;
@@ -51,24 +49,21 @@ header h1{margin:0;color:var(--green-5)}
 .year h2{
   text-align:center;
   color:var(--pink-4);
-  margin:6px 0 10px;
-  font-size:15px;
+  margin:8px 0 12px;
 }
 .course{
-  background:var(--green-2);
+  background:var(--pink-2);
   border-radius:12px;
-  padding:8px;
-  margin-bottom:8px;
+  padding:10px;
+  margin-bottom:10px;
   cursor:pointer;
   position:relative;
   transition:.2s;
-  font-size:13px;
 }
 .course:hover{transform:scale(1.02)}
 .course.approved{
-  background:var(--green-4);
+  background:var(--pink-4);
   color:white;
-  text-decoration:line-through;
 }
 .course.blocked{
   background:var(--blocked);
@@ -76,10 +71,7 @@ header h1{margin:0;color:var(--green-5)}
   cursor:not-allowed;
 }
 .course.coreq{
-  border:2px dashed var(--green-4);
-}
-.course.coreq::after{
-  content:" 🌸";
+  border:2px dashed var(--pink-4);
 }
 .course .code{
   font-size:12px;
@@ -113,27 +105,12 @@ header h1{margin:0;color:var(--green-5)}
 }
 .legend span{display:flex;align-items:center;gap:6px}
 .dot{width:14px;height:14px;border-radius:4px}
-.progress-bar{
-  width:100%;
-  height:10px;
-  background:var(--pink-2);
-  border-radius:8px;
-  margin-top:8px;
-  overflow:hidden;
-}
-#progressFill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--green-3),var(--green-5));
-  transition:width .4s ease;
-}
 </style>
 </head>
 <body>
 <header>
-  <h1>Pensum Química Farmacéutica – Versión 06</h1>
+  <h1>Malla Curricular – Química Farmacéutica</h1>
   <p>Universidad de Antioquia · Progreso guardado automáticamente</p>
-<div class="progress-bar"><div id="progressFill"></div></div>
 </header>
 <div id="progress">Créditos aprobados: <strong><span id="credits">0</span></strong></div>
 <div class="legend">
@@ -248,81 +225,48 @@ let state = JSON.parse(localStorage.getItem('qf-progress')||'{}');
 
 function isApproved(code){return state[code]===true}
 function prereqOk(course){
-  if(course.pr && !course.pr.every(isApproved)) return false;
-  if(course.prCredits){
-    let sum = 0;
-    for(const k in state){ if(state[k]) sum += 1; }
-    if(sum < course.prCredits) return false;
-  }
-  return true;
+  if(!course.pr) return true;
+  return course.pr.every(isApproved);
 }
 function render(){
-  const grid = document.getElementById('grid');
-  if(!grid){ console.error('No existe #grid'); return; }
-
-  grid.innerHTML = '';
-  let totalCredits = 0;
-
-  data.forEach(level => {
-    const col = document.createElement('div');
-    col.className = 'year';
-    col.innerHTML = `<h2>Semestre ${level.level}</h2>`;
-
-    level.courses.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'course';
-
-      const blocked = !prereqOk(c);
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  let totalCredits=0;
+  data.forEach(level=>{
+    const col=document.createElement('div');
+    col.className='year';
+    col.innerHTML=`<h2>Nivel ${level.level}</h2>`;
+    level.courses.forEach(c=>{
+      const div=document.createElement('div');
+      const blocked=!prereqOk(c);
+      div.className='course';
       if(blocked) div.classList.add('blocked');
       if(c.coreq) div.classList.add('coreq');
-
       if(isApproved(c.code)){
         div.classList.add('approved');
-        totalCredits += c.cr;
+        totalCredits+=c.cr;
       }
-
-      div.innerHTML = `
-        <div class="code">${c.code}</div>
-        <strong>${c.name}</strong>
-        <div class="credits">${c.cr} créditos</div>
-      `;
-
+      div.innerHTML=`<div class="code">${c.code}</div><strong>${c.name}</strong><div class="credits">${c.cr} créditos</div>`;
       if(blocked){
-        const tip = document.createElement('div');
-        tip.className = 'tooltip';
-        tip.textContent = 'Faltan prerrequisitos';
+        const tip=document.createElement('div');
+        tip.className='tooltip';
+        tip.textContent='Faltan prerrequisitos';
         div.appendChild(tip);
       }
-
-      div.onclick = () => {
+      div.onclick=()=>{
         if(blocked) return;
-        state[c.code] = !isApproved(c.code);
-        localStorage.setItem('qf-progress', JSON.stringify(state));
+        state[c.code]=!isApproved(c.code);
+        localStorage.setItem('qf-progress',JSON.stringify(state));
         render();
-      };
-
-      col.appendChild(div);
-    });
-
-    grid.appendChild(col);
-  });
-
-  document.getElementById('credits').textContent = totalCredits;
-  const totalPensum = 160;
-  document.getElementById('progressFill').style.width = Math.min(100,(totalCredits/totalPensum)*100) + '%';
-}
-
-render();
       };
       col.appendChild(div);
     });
     grid.appendChild(col);
   });
   document.getElementById('credits').textContent=totalCredits;
-  const totalPensum=160;
-  document.getElementById('progressFill').style.width=Math.min(100,(totalCredits/totalPensum)*100)+'%';
 }
 render();
 </script>
 </body>
 </html>
+
