@@ -10,16 +10,15 @@
             --card-bg: #ffffff;
             --text-color: #2c0808;
             --primary-red: #c62828;
-            --primary-red-hover: #8e0000;
-            --light-red: #ef9a9a;
-            --available-bg: #ffcdd2;
-            --available-text: #b71c1c;
-            --approved-bg: #ffebee;
-            --approved-text: #9e9e9e;
-            --blocked-bg: #f5f5f5;
-            --blocked-text: #bdbdbd;
-            --border-color: #ef5350;
-            --shadow: 0 2px 5px rgba(198, 40, 40, 0.15);
+            --dark-red: #8e0000;
+            --light-red: #ef5350;
+            --pale-red: #ffcdd2;
+            --approved-bg: #ef9a9a;
+            --approved-text: #ffffff;
+            --blocked-bg: #eeeeee;
+            --blocked-text: #9e9e9e;
+            --border-color: #e53935;
+            --shadow: 0 2px 5px rgba(198, 40, 40, 0.2);
             --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -42,7 +41,7 @@
         }
 
         h1 {
-            color: var(--primary-red);
+            color: var(--dark-red);
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -61,7 +60,7 @@
 
         .progress-bar {
             height: 100%;
-            background-color: var(--primary-red);
+            background: linear-gradient(90deg, var(--dark-red), var(--primary-red));
             width: 0%;
             transition: width 0.5s ease;
             border-radius: 15px;
@@ -70,7 +69,7 @@
         .progress-text {
             text-align: center;
             font-weight: bold;
-            color: var(--primary-red-hover);
+            color: var(--dark-red);
             font-size: 1rem;
             margin-bottom: 20px;
             min-height: 1.5em;
@@ -86,19 +85,20 @@
         }
 
         button.reset-btn {
-            background-color: var(--primary-red);
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: background 0.3s;
+            transition: all 0.3s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         button.reset-btn:hover {
-            background-color: var(--primary-red-hover);
+            background: linear-gradient(135deg, var(--dark-red), #5c0000);
+            transform: scale(1.05);
         }
 
         .legend {
@@ -133,7 +133,7 @@
         }
 
         .semester-column {
-            background-color: rgba(255,255,255,0.6);
+            background-color: rgba(255,255,255,0.8);
             border-radius: 12px;
             padding: 12px;
             display: flex;
@@ -146,15 +146,15 @@
         .semester-header {
             text-align: center;
             font-weight: bold;
-            color: var(--primary-red);
+            color: var(--dark-red);
             padding-bottom: 8px;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 3px solid var(--primary-red);
             margin-bottom: 5px;
             font-size: 1.1rem;
         }
 
         .course-card {
-            background-color: var(--available-bg);
+            background: linear-gradient(135deg, var(--pale-red), #ff8a80);
             border: 2px solid var(--primary-red);
             border-radius: 8px;
             padding: 10px;
@@ -172,8 +172,9 @@
 
         .course-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(198, 40, 40, 0.3);
+            box-shadow: 0 6px 15px rgba(198, 40, 40, 0.4);
             z-index: 10;
+            border-color: var(--dark-red);
         }
 
         .course-header {
@@ -182,7 +183,7 @@
 
         .course-code {
             font-size: 0.65rem;
-            color: var(--primary-red-hover);
+            color: var(--dark-red);
             margin-bottom: 2px;
             display: block;
             font-weight: bold;
@@ -193,7 +194,7 @@
             line-height: 1.3;
             margin-bottom: 4px;
             display: block;
-            color: var(--available-text);
+            color: var(--dark-red);
         }
 
         .course-credits {
@@ -207,40 +208,40 @@
             border-top: 1px dashed var(--light-red);
         }
 
-        /* APROBADA - Color claro y tachado */
+        /* APROBADA - Rojo intenso visible */
         .course-card.approved {
-            background-color: var(--approved-bg);
-            border-color: var(--light-red);
-            color: var(--approved-text);
-            box-shadow: none;
-            opacity: 0.7;
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            border-color: var(--dark-red);
+            box-shadow: 0 4px 10px rgba(142, 0, 0, 0.3);
         }
         
         .course-card.approved .course-code {
-            color: var(--approved-text);
+            color: #ffffff;
         }
         
         .course-card.approved .course-name {
-            color: var(--approved-text);
+            color: #ffffff;
             text-decoration: line-through;
+            text-decoration-thickness: 2px;
         }
         
         .course-card.approved .course-credits {
-            color: var(--approved-text);
+            color: #ffcdd2;
+            border-top-color: rgba(255,255,255,0.3);
         }
 
         .course-card.selected {
-            border: 3px solid var(--primary-red);
-            background-color: var(--available-bg);
+            border: 3px solid var(--dark-red);
+            background: linear-gradient(135deg, #ff8a80, var(--primary-red));
             transform: scale(1.02);
         }
 
         .course-card.blocked {
-            background-color: var(--blocked-bg);
-            border-color: #e0e0e0;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            border-color: #bdbdbd;
             color: var(--blocked-text);
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.5;
             pointer-events: none;
             box-shadow: none;
         }
@@ -259,7 +260,7 @@
         
         .course-card.corequisite-style.approved {
             border-style: solid;
-            border-color: var(--light-red);
+            border-color: var(--dark-red);
         }
 
         @media (max-width: 1200px) {
@@ -290,17 +291,17 @@
 
     <div class="controls">
         <div class="legend">
-            <div class="legend-item"><div class="legend-box" style="background:var(--available-bg); border:2px solid var(--primary-red)"></div> Disponible</div>
-            <div class="legend-item"><div class="legend-box" style="background:var(--approved-bg); border:2px solid var(--light-red)"></div> Aprobada</div>
-            <div class="legend-item"><div class="legend-box" style="background:#f5f5f5; border:2px solid #e0e0e0"></div> Bloqueada</div>
-            <div class="legend-item"><div class="legend-box" style="border:2px dashed var(--primary-red); background:var(--available-bg)"></div> Con Correquisito 🌺</div>
+            <div class="legend-item"><div class="legend-box" style="background:linear-gradient(135deg, #ffcdd2, #ff8a80); border:2px solid var(--primary-red)"></div> Disponible</div>
+            <div class="legend-item"><div class="legend-box" style="background:linear-gradient(135deg, var(--primary-red), var(--dark-red)); border:2px solid var(--dark-red)"></div> Aprobada</div>
+            <div class="legend-item"><div class="legend-box" style="background:linear-gradient(135deg, #f5f5f5, #e0e0e0); border:2px solid #bdbdbd"></div> Bloqueada</div>
+            <div class="legend-item"><div class="legend-box" style="border:2px dashed var(--primary-red); background:var(--pale-red)"></div> Con Correquisito 🔴</div>
         </div>
         <button class="reset-btn" onclick="resetProgress()">Reiniciar Progreso</button>
     </div>
-    <p style="font-size: 0.85rem; color: #8e0000; max-width: 800px; text-align: center; background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--light-red);">
+    <p style="font-size: 0.85rem; color: var(--dark-red); max-width: 800px; text-align: center; background: white; padding: 10px; border-radius: 8px; border: 2px solid var(--light-red);">
         💡 <strong>Instrucciones:</strong> Haz clic en una materia para marcarla como <strong>Aprobada</strong>. 
-        Las materias disponibles tienen color fuerte. Las aprobadas se vuelven claras y se tachan. 
-        Las materias con borde punteado y emoji 🌺 tienen correquisitos.
+        Las materias disponibles tienen tonos rojos claros. Las aprobadas se vuelven rojas intensas con texto blanco tachado. 
+        Las materias con borde punteado y emoji 🔴 tienen correquisitos.
     </p>
 </header>
 
@@ -445,14 +446,14 @@
     };
 
     function loadState() {
-        const saved = localStorage.getItem('udea_qf_malla_v5_2024');
+        const saved = localStorage.getItem('udea_qf_malla_v6_2024_red');
         if (saved) {
             appState = JSON.parse(saved);
         }
     }
 
     function saveState() {
-        localStorage.setItem('udea_qf_malla_v5_2024', JSON.stringify(appState));
+        localStorage.setItem('udea_qf_malla_v6_2024_red', JSON.stringify(appState));
         updateProgress();
     }
 
@@ -591,7 +592,7 @@
                 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'course-name';
-                const emoji = hasCoreq ? " 🌺" : "";
+                const emoji = hasCoreq ? " 🔴" : "";
                 nameSpan.textContent = course.name + emoji;
                 
                 const credSpan = document.createElement('span');
